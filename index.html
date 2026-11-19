@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080d0a">
+<title>DCO CyberQuiz | DCO Cyber Solutions</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;padding:20px;background:#080d0a;color:#eaffef;font-family:Arial}
+main{max-width:700px;margin:30px auto;background:#111b14;border:1px solid #285239;border-radius:18px;padding:24px}
+h1{text-align:center;color:#43ff91;font-size:34px}
+.sub{text-align:center;color:#91a99a}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:20px 0}
+.stat{background:#07100b;padding:14px 5px;text-align:center;border-radius:9px;color:#a5bbaa;font-size:12px}
+.stat b{display:block;color:#43ff91;font-size:23px;margin-top:8px}
+button{cursor:pointer;border:1px solid #31563d;border-radius:9px;padding:14px;background:#09120c;color:white;font-weight:bold}
+.primary{background:#43ff91;color:#061109;width:100%;border:0;margin-top:15px}
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:20px 0}
+.level.active{border-color:#43ff91;color:#43ff91}
+.option{display:block;width:100%;text-align:left;margin:10px 0;padding:15px;background:#09120c;color:white;border:1px solid #31563d}
+.option.correct{background:#124426;border-color:#43ff91}
+.option.wrong{background:#491c1c;border-color:#ff6666}
+#question{line-height:1.5}
+#feedback{min-height:25px;color:#43ff91;margin-top:15px}
+.bar{height:6px;background:#263a2c;margin:15px 0 22px;border-radius:10px}
+#progress{height:6px;background:#43ff91;width:0;border-radius:10px}
+.hidden{display:none}
+.result{text-align:center}
+.result h2,.result strong{color:#43ff91}
+.result strong{font-size:48px}
+footer{text-align:center;color:#718477;font-size:11px;margin-top:25px}
+</style>
+<style>
+/* DCO CYBERQUIZ ACCOUNT INTERFACE */
+.account-access {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:18px 0;
+}
+.account-panel {
+  margin:18px 0;
+  padding:20px;
+  background:#151f18;
+  border:1px solid #35443a;
+  border-radius:15px;
+}
+.account-panel input {
+  width:100%;
+  padding:14px;
+  margin:8px 0 14px;
+  background:#09120c;
+  color:#eaffef;
+  border:1px solid #35443a;
+  border-radius:9px;
+}
+.account-panel label {
+  display:block;
+  color:#91c5a0;
+  font-size:12px;
+  font-weight:bold;
+}
+.account-secondary {
+  width:100%;
+  margin-top:10px;
+}
+.account-grid {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin:15px 0;
+}
+.account-stat {
+  padding:15px;
+  background:#09120c;
+  border:1px solid #35443a;
+  border-radius:10px;
+}
+.account-stat strong {
+  display:block;
+  color:#91c5a0;
+  font-size:23px;
+  margin-top:7px;
+}
+.account-note {
+  color:#9ba99f;
+  font-size:13px;
+  line-height:1.6;
+}
+.account-status {
+  min-height:24px;
+  color:#91c5a0;
+  margin-top:12px;
+}
+@media(max-width:450px) {
+  .account-access {grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<main>
+<header>
+<p class="sub brand"><span class="brand-icon">◈</span> DCO CYBER SOLUTIONS</p>
+<h1>DCO <span>CyberQuiz</span></h1>
+<p class="sub">TEST YOUR KNOWLEDGE. MASTER CYBERSECURITY.</p>
+</header>
+
+
+<section id="accountPanel">
+  <h2>DCO PLAYER ACCOUNT</h2>
+  <p class="account-note">Create your player account or sign in to access your saved progress.</p>
+
+  <div class="account-access">
+    <button type="button" onclick="showAccountMode('register')">CREATE ACCOUNT</button>
+    <button type="button" onclick="showAccountMode('login')">PLAYER LOGIN</button>
+  </div>
+
+  <div id="registerPanel" class="account-panel">
+    <h3>CREATE YOUR ACCOUNT</h3>
+    <label for="registerName">PLAYER DISPLAY NAME</label>
+    <input id="registerName" maxlength="20" placeholder="Choose a display name">
+    <label for="registerEmail">EMAIL ADDRESS</label>
+    <input id="registerEmail" type="email" autocomplete="email" placeholder="Enter your email">
+    <label for="registerPassword">PASSWORD</label>
+    <input id="registerPassword" type="password" autocomplete="new-password" placeholder="Create a password">
+    <button type="button" class="primary" onclick="accountPreview()">CREATE PLAYER ACCOUNT</button>
+  </div>
+
+  <div id="loginPanel" class="account-panel hidden">
+    <h3>WELCOME BACK</h3>
+    <label for="loginEmail">EMAIL ADDRESS</label>
+    <input id="loginEmail" type="email" autocomplete="email" placeholder="Enter your email">
+    <label for="loginPassword">PASSWORD</label>
+    <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter your password">
+    <button type="button" class="primary" onclick="accountPreview()">LOGIN</button>
+  </div>
+
+  <p id="accountStatus" class="account-status" role="status">
+    Account connection will be activated in the next step.
+  </p>
+</section>
+
+<section id="playerDashboard" class="hidden">
+  <h2>PLAYER DASHBOARD</h2>
+  <p class="account-note">Your personal DCO CyberQuiz progress.</p>
+  <div class="account-panel">
+    <p class="account-note">PLAYER PROFILE</p>
+    <h3 id="profileName">Player Name</h3>
+    <p id="profileId" class="account-note">Player ID: Pending account connection</p>
+  </div>
+  <div class="account-grid">
+    <div class="account-stat">TOTAL POINTS<strong id="profilePoints">0</strong></div>
+    <div class="account-stat">GAMES PLAYED<strong id="profileGames">0</strong></div>
+    <div class="account-stat">ACHIEVEMENTS<strong id="profileAchievements">0</strong></div>
+    <div class="account-stat">GLOBAL RANK<strong id="profileRank">—</strong></div>
+  </div>
+  <div class="account-panel">
+    <h3>QUIZ HISTORY</h3>
+    <p class="account-note" id="quizHistory">Your completed challenges will appear here.</p>
+  </div>
+  <div class="account-panel">
+    <h3>GLOBAL LEADERBOARD</h3>
+    <p class="account-note" id="globalLeaderboard">Player rankings will appear here.</p>
+  </div>
+  <button type="button" class="primary" onclick="dcoStartQuiz()">▶ START PLAYING</button>
+  <button type="button" class="account-secondary" onclick="dcoLogout()">LOG OUT</button>
+</section>
+
+<section id="home" class="hidden">
+<button type="button" class="account-secondary" onclick="dcoShowDashboard()">👤 PLAYER DASHBOARD</button>
+
+<h2>Welcome, Security Analyst</h2>
+<p>Select your difficulty and test your cybersecurity knowledge.</p>
+<div class="levels">
+<button class="level active" onclick="choose('Beginner',this)">BEGINNER</button>
+<button class="level" onclick="choose('Intermediate',this)">INTERMEDIATE</button>
+<button class="level" onclick="choose('Advanced',this)">ADVANCED</button>
+</div>
+<div class="badge-card" id="badgeStatus">
+<div class="badge-icon">🏅</div>
+<div><strong>DCO CYBERQUIZ ACHIEVEMENT</strong>
+<p id="badgeText">Complete all three levels to unlock your badge.</p></div>
+</div>
+<p>10 questions per challenge • 30 seconds per question</p>
+<button class="primary" onclick="start()">▶ &nbsp; START CHALLENGE</button>
+
+</section>
+
+
+
+<section id="game" class="hidden">
+<button class="menu-btn" onclick="returnMenu()">← RETURN TO MENU</button>
+<div class="stats">
+<div class="stat">◷ QUESTION<b id="count">1/10</b></div>
+<div class="stat">◇ SCORE<b id="score">0</b></div>
+<div class="stat">◴ TIME<b id="timer">30</b></div>
+</div>
+<div class="bar"><div id="progress"></div></div>
+<h2 id="question"></h2>
+<div id="options"></div>
+<div id="feedback"></div>
+<button class="primary" id="next" disabled onclick="next()">NEXT QUESTION &nbsp; →</button>
+</section>
+
+<section id="result" class="hidden result">
+<h2>CHALLENGE COMPLETED</h2>
+<strong id="final">0/10</strong>
+<h3 id="message"></h3>
+<p id="details"></p>
+<button class="primary" onclick="home()">PLAY AGAIN</button>
+</section>
+
+
+
+<footer>© 2026 DCO CYBER SOLUTIONS | DCO CYBERQUIZ</footer>
+</main>
+
+<script>
+
+function showAccountPanel(){
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("game").classList.add("hidden");
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("playerDashboard").classList.add("hidden");
+  document.getElementById("accountPanel").classList.remove("hidden");
+}
+
+function hideAccountPanel(){
+  document.getElementById("accountPanel").classList.add("hidden");
+  document.getElementById("playerDashboard").classList.add("hidden");
+  document.getElementById("home").classList.remove("hidden");
+}
+
+function showAccountMode(mode){
+  document.getElementById("registerPanel").classList.toggle("hidden", mode !== "register");
+  document.getElementById("loginPanel").classList.toggle("hidden", mode !== "login");
+  document.getElementById("accountStatus").textContent =
+    "Ready! Enter your details to access DCO CyberQuiz.";
+}
+
+function accountPreview(){
+  document.getElementById("accountStatus").textContent =
+    "Enter your details to create your account or sign in.";
+}
+
+const bank={
+Beginner:[
+["What does CPU stand for?",["Central Processing Unit","Computer Personal Utility","Central Program User"],0],
+["What is phishing?",["A programming language","A deceptive attempt to steal information","A firewall"],1],
+["What does antivirus detect?",["Malware","Keyboard errors","Screen brightness"],0],
+["Which is a strong password?",["123456","password","A long unique combination"],2],
+["What does HTTPS help provide?",["Encrypted communication","More storage","Free internet"],0],
+["What is malware?",["Computer hardware","Malicious software","A browser"],1],
+["What is a firewall?",["Network traffic filter","Photo editor","Storage device"],0],
+["What is two-factor authentication?",["Two usernames","An extra identity verification step","Two browsers"],1],
+["What should you do with suspicious links?",["Click immediately","Share them","Avoid and verify them"],2],
+["What is a backup?",["A copy of data","A virus","A password"],0]
+],
+Intermediate:[
+["What is a brute-force attack?",["Repeated password guessing","Data backup","Software update"],0],
+["What does SHA-256 produce?",["A hash digest","An IP address","A username"],0],
+["What is SQL injection?",["An attack on unsafe database queries","A backup method","An encryption standard"],0],
+["What does DNS translate?",["Domain names into IP addresses","Passwords into usernames","Files into folders"],0],
+["What is a VPN?",["An encrypted network connection","A browser","An antivirus"],0],
+["What is a zero-day vulnerability?",["A flaw unknown to the vendor or without a fix","An expired password","A backup"],0],
+["Which protocol commonly uses port 443?",["HTTPS","FTP","Telnet"],0],
+["What is social engineering?",["Manipulating people","Building websites","Encrypting disks"],0],
+["What is MFA?",["Multiple verification factors","Multiple file archives","A firewall"],0],
+["What is a security patch?",["An update fixing vulnerabilities","A network cable","A password list"],0]
+],
+Advanced:[
+["What is digital forensics?",["Examining digital evidence","Deleting logs","Building websites"],0],
+["What does chain of custody record?",["Evidence handling and transfers","Employee attendance","Website traffic"],0],
+["What is memory forensics?",["Examining volatile memory","Repairing a hard drive","Scanning paper"],0],
+["What is a hash collision?",["Different inputs producing the same hash","A server crash","A password reset"],0],
+["What is an IOC in cybersecurity?",["Indicator of Compromise","Internet Operating Code","Internal Online Connection"],0],
+["What is the principle of least privilege?",["Giving only necessary access","Giving everyone admin rights","Sharing passwords"],0],
+["What is SIEM used for?",["Collecting and analyzing security events","Editing images","Compressing files"],0],
+["What is a sandbox?",["An isolated environment for testing","A password manager","A network cable"],0],
+["What is an incident response plan?",["A documented approach to handling security incidents","A marketing plan","A backup drive"],0],
+["What is file integrity monitoring?",["Detecting unauthorized file changes","Improving internet speed","Creating accounts"],0]
+]
+};
+
+let level="Beginner",questions=[],index=0,score=0,time=30,clock=null,answered=false;
+
+const levels=["Beginner","Intermediate","Advanced"];
+const storageKey="dcoCyberQuizCompleted";
+
+function getCompleted(){
+try{return JSON.parse(localStorage.getItem(storageKey)||"[]")}
+catch(e){return []}
+}
+
+function updateBadge(){
+const completed=getCompleted();
+const unlocked=levels.every(l=>completed.includes(l));
+const card=document.getElementById("badgeStatus");
+const text=document.getElementById("badgeText");
+if(!card||!text)return;
+
+card.classList.toggle("unlocked",unlocked);
+card.querySelector(".badge-icon").textContent=unlocked?"🏆":"🏅";
+text.textContent=unlocked
+?"UNLOCKED! You completed all three difficulty levels."
+:"Progress: "+completed.length+"/3 levels completed. Finish all three to unlock your badge.";
+}
+
+function choose(l,btn){
+level=l;
+document.querySelectorAll(".level").forEach(b=>b.classList.remove("active"));
+btn.classList.add("active");
+}
+
+function start(){
+// Daily deterministic question rotation.
+const today=new Date().toLocaleDateString("en-CA");
+let seed=0;
+for(const char of today+"-"+level)seed=(seed*31+char.charCodeAt(0))>>>0;
+function random(){
+seed=(seed*1664525+1013904223)>>>0;
+return seed/4294967296;
+}
+questions=[...bank[level]];
+for(let i=questions.length-1;i>0;i--){
+const j=Math.floor(random()*(i+1));
+[questions[i],questions[j]]=[questions[j],questions[i]];
+}
+index=0;score=0;
+document.getElementById("home").classList.add("hidden");
+document.getElementById("result").classList.add("hidden");
+document.getElementById("game").classList.remove("hidden");
+load();
+}
+
+function load(){
+clearInterval(clock);
+answered=false;time=30;
+document.getElementById("timer").textContent=time;
+document.getElementById("score").textContent=score;
+document.getElementById("count").textContent=(index+1)+"/10";
+document.getElementById("progress").style.width=(index*10)+"%";
+document.getElementById("question").textContent=questions[index][0];
+document.getElementById("feedback").textContent="";
+document.getElementById("next").disabled=true;
+let box=document.getElementById("options");
+box.innerHTML="";
+questions[index][1].forEach((answer,i)=>{
+let b=document.createElement("button");
+b.className="option";
+b.textContent=String.fromCharCode(65+i)+". "+answer;
+b.onclick=()=>check(i);
+box.appendChild(b);
+});
+clock=setInterval(()=>{
+time--;
+document.getElementById("timer").textContent=time;
+if(time<=0)check(-1);
+},1000);
+}
+
+function check(choice){
+if(answered)return;
+answered=true;clearInterval(clock);
+let correct=questions[index][2];
+let buttons=document.querySelectorAll(".option");
+buttons.forEach((b,i)=>{
+b.disabled=true;
+if(i===correct)b.classList.add("correct");
+if(i===choice&&choice!==correct)b.classList.add("wrong");
+});
+if(choice===correct){
+score++;
+document.getElementById("feedback").textContent="CORRECT! Well done, analyst.";
+}else{
+document.getElementById("feedback").textContent="Incorrect. Correct answer: "+questions[index][1][correct];
+}
+document.getElementById("score").textContent=score;
+document.getElementById("next").disabled=false;
+}
+
+function next(){
+if(!answered)return;
+index++;
+if(index>=questions.length){finish();return;}
+load();
+}
+
+function finish(){
+clearInterval(clock);
+
+const completed=getCompleted();
+if(!completed.includes(level)){
+completed.push(level);
+localStorage.setItem(storageKey,JSON.stringify(completed));
+}
+updateBadge();
+
+document.getElementById("game").classList.add("hidden");
+document.getElementById("result").classList.remove("hidden");
+document.getElementById("final").textContent=score+"/10";
+document.getElementById("message").textContent=
+score===10?"EXCELLENT! PERFECT SCORE":
+score>=7?"GREAT WORK, SECURITY ANALYST":
+score>=4?"GOOD EFFORT. KEEP LEARNING":
+"KEEP PRACTISING. YOU CAN IMPROVE!";
+document.getElementById("details").textContent=
+"Difficulty: "+level+" | Correct answers: "+score+" | Accuracy: "+(score*10)+"%";
+}
+
+function home(){
+clearInterval(clock);
+document.getElementById("result").classList.add("hidden");
+document.getElementById("game").classList.add("hidden");
+document.getElementById("home").classList.remove("hidden");
+updateBadge();
+}
+
+function returnMenu(){
+home();
+}
+
+updateBadge();
+</script>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* DCO SUPABASE AUTH CONNECTION */
+(function () {
+  const SUPABASE_URL = "https://iziubjzrlvxmdfopnatd.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_pG2wMogK9MyJ1MRC7QLEFA_xRnQPX9Y";
+
+  const client = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+  window.dcoSupabase = client;
+
+  const el = id => document.getElementById(id);
+
+  function status(message) {
+    el("accountStatus").textContent = message;
+  }
+
+  async function openDashboard(user) {
+    const { data, error } = await client
+      .from("player_profiles")
+      .select("id, display_name, games_played, total_points, achievements")
+      .eq("id", user.id)
+      .single();
+
+    if (error) {
+      status("Signed in, but profile loading failed: " + error.message);
+      return;
+    }
+
+    el("accountPanel").classList.add("hidden");
+    el("home").classList.add("hidden");
+    el("game").classList.add("hidden");
+    el("result").classList.add("hidden");
+    el("playerDashboard").classList.remove("hidden");
+
+    el("profileName").textContent = data.display_name;
+    el("profileId").textContent = "Player ID: " + data.id;
+    el("profilePoints").textContent = data.total_points;
+    el("profileGames").textContent = data.games_played;
+    el("profileAchievements").textContent = data.achievements;
+    el("profileRank").textContent = "Pending";
+    el("quizHistory").textContent = "Your quiz history will be connected next.";
+    el("globalLeaderboard").textContent = "Global rankings will be connected next.";
+  }
+
+  window.accountPreview = async function () {
+    const isRegister = !el("registerPanel").classList.contains("hidden");
+    const email = (isRegister ? el("registerEmail") : el("loginEmail"))
+      .value.trim();
+    const password = (isRegister ? el("registerPassword") : el("loginPassword"))
+      .value;
+
+    if (!email || !password) {
+      status("Enter your email address and password.");
+      return;
+    }
+
+    if (isRegister) {
+      const displayName = el("registerName").value.trim();
+
+      if (!displayName || displayName.length > 20) {
+        status("Enter a display name between 1 and 20 characters.");
+        return;
+      }
+
+      if (password.length < 8) {
+        status("Your password must contain at least 8 characters.");
+        return;
+      }
+
+      status("Creating your player account...");
+
+      const { data, error } = await client.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { display_name: displayName }
+        }
+      });
+
+      if (error) {
+        status("Registration failed: " + error.message);
+        return;
+      }
+
+      if (data.session) {
+        status("Account created successfully.");
+        await openDashboard(data.user);
+      } else {
+        status("Account created. Check your email for the confirmation link, then return here and log in.");
+      }
+      return;
+    }
+
+    status("Signing you in...");
+
+    const { data, error } = await client.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      status("Login failed: " + error.message);
+      return;
+    }
+
+    status("Login successful.");
+    await openDashboard(data.user);
+  };
+
+  window.dcoStartQuiz = function () {
+    el("playerDashboard").classList.add("hidden");
+    el("accountPanel").classList.add("hidden");
+    el("game").classList.add("hidden");
+    el("result").classList.add("hidden");
+    el("home").classList.remove("hidden");
+    window.scrollTo(0, 0);
+  };
+
+  window.dcoShowDashboard = async function () {
+    const { data, error } = await client.auth.getUser();
+
+    if (error || !data.user) {
+      status("Please log in to view your dashboard.");
+      el("home").classList.add("hidden");
+      el("accountPanel").classList.remove("hidden");
+      showAccountMode("login");
+      return;
+    }
+
+    await openDashboard(data.user);
+    window.scrollTo(0, 0);
+  };
+
+  window.dcoLogout = async function () {
+    status("Signing out...");
+    const { error } = await client.auth.signOut();
+
+    if (error) {
+      status("Logout failed: " + error.message);
+      return;
+    }
+
+    el("playerDashboard").classList.add("hidden");
+    el("home").classList.add("hidden");
+    el("game").classList.add("hidden");
+    el("accountPanel").classList.remove("hidden");
+    showAccountMode("register");
+    status("You have signed out. Create an account or log in.");
+  };
+
+  client.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_OUT") {
+      el("playerDashboard").classList.add("hidden");
+      el("home").classList.add("hidden");
+      el("game").classList.add("hidden");
+      el("accountPanel").classList.remove("hidden");
+      showAccountMode("register");
+    }
+  });
+
+  client.auth.getSession().then(({ data, error }) => {
+    if (error) {
+      status("Could not check saved login session.");
+      return;
+    }
+    if (data.session) openDashboard(data.session.user);
+  });
+})();
+</script>
+
+</body>
+</html>
+
+<style>
+/* DCO CYBERQUIZ MODERN INTERFACE */
+body {
+ background:
+ radial-gradient(ellipse at 15% 5%, rgba(66,145,99,.09), transparent 42%),
+ radial-gradient(ellipse at 90% 90%, rgba(66,145,99,.06), transparent 38%),
+ #101512;
+ color:#e4ebe6;
+ font-family:Inter,system-ui,-apple-system,sans-serif;
+ letter-spacing:.1px;
+}
+main {
+ background:rgba(25,33,28,.94);
+ border:1px solid #35443a;
+ border-radius:20px;
+ box-shadow:0 18px 55px rgba(0,0,0,.22);
+}
+header {margin-bottom:35px}
+.brand {
+ font-size:11px;
+ letter-spacing:3px;
+ color:#a5b6a9;
+}
+.brand-icon {
+ color:#75b58a;
+ font-size:17px;
+}
+h1 {
+ color:#e8eee9;
+ font-weight:700;
+ letter-spacing:-1.5px;
+}
+h1 span {color:#82b895}
+h2 {font-weight:650;color:#e4ece6}
+.sub {color:#9ba99f}
+.panel {
+ background:#1b241e;
+ border-color:#35443a;
+ border-radius:15px;
+}
+.stat {
+ background:#151d18;
+ border:1px solid #303d34;
+ border-radius:12px;
+ color:#a6b3aa;
+}
+.stat b {color:#91c5a0;font-weight:650}
+.level {
+ background:#151d18;
+ border-color:#35443a;
+ transition:.2s ease;
+}
+.level.active {
+ background:#24392b;
+ border-color:#78b48a;
+ color:#a8d6b4;
+}
+button {
+ border-radius:10px;
+ transition:background .2s,border-color .2s,transform .2s;
+}
+button:hover:not(:disabled) {
+ transform:translateY(-1px);
+}
+.primary {
+ background:#78ad88;
+ color:#102016;
+}
+.primary:hover:not(:disabled) {
+ background:#91c19f;
+}
+.option {
+ background:#151d18;
+ border-color:#35443a;
+ color:#e2e9e3;
+}
+.option:hover:not(:disabled) {
+ background:#202d24;
+ border-color:#78ad88;
+}
+.option.correct {
+ background:#243d2c;
+ border-color:#78ad88;
+}
+.option.wrong {
+ background:#392725;
+ border-color:#b77c76;
+}
+.bar {background:#303a32}
+#progress {background:#83b993}
+#feedback {color:#9bc9a7}
+.result-score {color:#91c49e}
+.result h2 {color:#91c49e}
+footer {color:#89968c}
+</style>
+
+<style>
+/* MOBILE RESPONSIVENESS FIX */
+@media(max-width:600px){
+  body{padding:12px}
+  main{
+    margin:12px auto;
+    padding:19px;
+    width:100%;
+  }
+  .levels{
+    grid-template-columns:1fr;
+    gap:9px;
+  }
+  .level{
+    width:100%;
+    min-height:48px;
+  }
+  h1{font-size:30px}
+  #question{font-size:19px}
+  .stats{gap:6px}
+  .stat{font-size:10px;padding:12px 3px}
+  .stat b{font-size:20px}
+  .primary{min-height:50px}
+}
+</style>
+
+<style>
+/* DCO CYBERQUIZ DAILY ROTATION AND ACHIEVEMENTS */
+.badge-card{
+ display:flex;
+ align-items:center;
+ gap:15px;
+ margin:22px 0;
+ padding:16px;
+ border:1px solid #35443a;
+ background:#151d18;
+ border-radius:13px;
+}
+.badge-icon{
+ font-size:32px;
+ min-width:42px;
+ text-align:center;
+}
+.badge-card strong{
+ color:#91c49e;
+ font-size:13px;
+ letter-spacing:.5px;
+}
+.badge-card p{
+ color:#a6b3aa;
+ font-size:13px;
+ line-height:1.5;
+ margin:7px 0 0;
+}
+.badge-card.unlocked{
+ border-color:#b99b53;
+ background:linear-gradient(120deg,#29291d,#19251c);
+}
+.badge-card.unlocked strong{
+ color:#e0c477;
+}
+.menu-btn{
+ display:block;
+ width:100%;
+ margin-bottom:20px;
+ background:#202a23;
+ border:1px solid #435348;
+ color:#d9e5dc;
+ text-align:left;
+}
+.menu-btn:hover{
+ background:#2a382e;
+}
+</style>
+
+<style>
+/* DCO CYBERQUIZ - MIDNIGHT BLUE THEME */
+
+body {
+ background:
+ radial-gradient(ellipse at 10% 0%,rgba(45,115,190,.20),transparent 45%),
+ radial-gradient(ellipse at 90% 100%,rgba(35,170,220,.10),transparent 40%),
+ #101C35 !important;
+ color:#F1F5FA !important;
+}
+
+main {
+ background:rgba(20,35,60,.96) !important;
+ border:1px solid #304867 !important;
+ box-shadow:0 25px 70px rgba(0,0,0,.30);
+}
+
+.panel {
+ background:#172943 !important;
+ border-color:#304867 !important;
+}
+
+h1,h2,h3 {
+ color:#F1F5FA !important;
+}
+
+h1 span {
+ color:#55D9FF !important;
+}
+
+.sub,.stat {
+ color:#A9BDD4 !important;
+}
+
+.stat,.option,.level,.badge-card {
+ background:#101F38 !important;
+ border-color:#304867 !important;
+}
+
+.stat b {
+ color:#55D9FF !important;
+}
+
+.level.active {
+ background:#1C3C59 !important;
+ border-color:#55D9FF !important;
+ color:#55D9FF !important;
+}
+
+button.primary {
+ background:#55D9FF !important;
+ color:#101C35 !important;
+}
+
+button.primary:hover {
+ background:#83E5FF !important;
+}
+
+.option {
+ color:#F1F5FA !important;
+}
+
+.option:hover:not(:disabled) {
+ border-color:#55D9FF !important;
+}
+
+.option.correct {
+ background:#16443E !important;
+ border-color:#55D9FF !important;
+}
+
+.option.wrong {
+ background:#472A39 !important;
+ border-color:#E58B9C !important;
+}
+
+#feedback,#progress {
+ color:#55D9FF !important;
+}
+
+#progress {
+ background:#55D9FF !important;
+}
+
+.bar {
+ background:#304867 !important;
+}
+
+.badge-card strong {
+ color:#55D9FF !important;
+}
+
+.badge-card.unlocked {
+ border-color:#E8C66D !important;
+ background:#29334B !important;
+}
+
+.menu-btn {
+ background:#203A58 !important;
+ color:#F1F5FA !important;
+}
+
+footer {
+ color:#91A7C2 !important;
+}
+</style>
+
+
+<style>
+/* DCO CYBERQUIZ LIVE INTERACTION */
+
+#live-clock{
+ display:inline-flex;
+ padding:9px 14px;
+ margin:12px auto;
+ border:1px solid #304867;
+ border-radius:30px;
+ background:#101f38;
+ color:#55d9ff;
+ font-size:12px;
+ letter-spacing:1px;
+}
+
+#game{
+ animation:panelEnter .4s ease;
+}
+
+@keyframes panelEnter{
+ from{opacity:0;transform:translateY(12px)}
+ to{opacity:1;transform:translateY(0)}
+}
+
+.option{
+ transition:all .22s ease !important;
+ position:relative;
+ overflow:hidden;
+}
+
+.option:active{
+ transform:scale(.98);
+}
+
+.option.correct{
+ animation:correctAnswer .35s ease;
+}
+
+.option.wrong{
+ animation:wrongAnswer .3s ease;
+}
+
+@keyframes correctAnswer{
+ 50%{transform:scale(1.02)}
+}
+
+@keyframes wrongAnswer{
+ 25%{transform:translateX(-3px)}
+ 75%{transform:translateX(3px)}
+}
+
+#progress{
+ transition:width .5s ease !important;
+ border-radius:10px;
+}
+
+#timer.urgent{
+ color:#ff9b91 !important;
+ animation:timerPulse .8s infinite alternate;
+}
+
+@keyframes timerPulse{
+ to{opacity:.45}
+}
+
+.badge-card.unlocked{
+ animation:badgeUnlock .7s ease;
+}
+
+@keyframes badgeUnlock{
+ 0%{transform:scale(.96);opacity:.6}
+ 70%{transform:scale(1.03)}
+ 100%{transform:scale(1);opacity:1}
+}
+
+button:focus-visible{
+ outline:2px solid #55d9ff;
+ outline-offset:4px;
+}
+
+#live-toast{
+ position:fixed;
+ bottom:22px;
+ left:50%;
+ transform:translateX(-50%) translateY(20px);
+ background:#203a58;
+ border:1px solid #55d9ff;
+ color:white;
+ padding:12px 20px;
+ border-radius:12px;
+ opacity:0;
+ pointer-events:none;
+ transition:.3s;
+ z-index:999;
+ text-align:center;
+ font-size:13px;
+}
+
+#live-toast.show{
+ opacity:1;
+ transform:translateX(-50%) translateY(0);
+}
+</style>
+
+<script>
+/* LIVE DCO CYBERQUIZ SYSTEM */
+(function(){
+
+const clock=document.createElement("div");
+clock.id="live-clock";
+clock.textContent="LOADING TIME...";
+const header=document.querySelector("header");
+if(header)header.appendChild(clock);
+
+function updateClock(){
+ const now=new Date();
+ clock.textContent=
+ now.toLocaleDateString("en-GB",{
+ weekday:"short",day:"2-digit",month:"short",year:"numeric"
+ })+"  |  "+now.toLocaleTimeString();
+}
+updateClock();
+setInterval(updateClock,1000);
+
+const toast=document.createElement("div");
+toast.id="live-toast";
+document.body.appendChild(toast);
+
+let toastTimer;
+
+function notify(message){
+ toast.textContent=message;
+ toast.classList.add("show");
+ clearTimeout(toastTimer);
+ toastTimer=setTimeout(()=>toast.classList.remove("show"),2200);
+}
+
+const oldCheck=window.check;
+
+if(typeof oldCheck==="function"){
+ window.check=function(choice){
+  if(document.querySelector("#game").classList.contains("hidden"))return;
+  oldCheck(choice);
+  const feedback=document.getElementById("feedback");
+  if(feedback)notify(feedback.textContent);
+ };
+}
+
+const oldLoad=window.load;
+
+if(typeof oldLoad==="function"){
+ window.load=function(){
+  oldLoad();
+  const game=document.getElementById("game");
+  game.style.animation="none";
+  void game.offsetWidth;
+  game.style.animation="panelEnter .4s ease";
+ };
+}
+
+const timer=document.getElementById("timer");
+
+if(timer){
+ const observer=new MutationObserver(()=>{
+  timer.classList.toggle("urgent",Number(timer.textContent)<=10);
+ });
+ observer.observe(timer,{childList:true,characterData:true,subtree:true});
+}
+
+document.addEventListener("keydown",function(e){
+ if(document.getElementById("game").classList.contains("hidden"))return;
+
+ const buttons=document.querySelectorAll(".option");
+ const key=e.key.toUpperCase();
+
+ if(["A","B","C"].includes(key)){
+  const i=key.charCodeAt(0)-65;
+  if(buttons[i]&&!buttons[i].disabled)buttons[i].click();
+ }
+
+ if(e.key==="Enter"){
+  const nextButton=document.getElementById("next");
+  if(nextButton&&!nextButton.disabled)nextButton.click();
+ }
+});
+
+const oldFinish=window.finish;
+
+if(typeof oldFinish==="function"){
+ window.finish=function(){
+  oldFinish();
+  notify("Challenge completed! Your results are ready.");
+ };
+}
+
+console.log("DCO CyberQuiz live interactions initialized.");
+
+})();
+</script>
+
